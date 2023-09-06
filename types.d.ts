@@ -32,7 +32,7 @@ export interface ProviderProps {
 }
 
 export interface PromptCardListProps {
-  data: PromptState[];
+  data: PromptState[] | [];
   handleTagClick: (tag: string) => void;
 }
 
@@ -40,13 +40,13 @@ export interface PromptCardProps {
   prompt: PromptState;
   handleTagClick?: (tag: string) => void;
   handleDelete?: () => void;
-  handleEdit?: (post: PromptState) => void;
+  handleEdit?: () => void;
 }
 
 export interface ProfileProps {
   name: string;
   desc: string;
   data: PromptState[];
-  handleEdit: (post: PromptState) => void;
-  handleDelete: () => void;
+  handleEdit?: (post: PromptState) => void;
+  handleDelete?: (post: PromptState) => void;
 }

@@ -34,7 +34,11 @@ export const PATCH = async (
   }
 };
 
-export const DELETE = async ({ params }: { params: { id: string } }) => {
+export const DELETE = async (
+  req: Request,
+  { params }: { params: { id: string } }
+) => {
+  console.log(params, "params");
   try {
     await connectToDB();
     await Prompt.findByIdAndRemove(params.id);

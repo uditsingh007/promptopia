@@ -1,15 +1,15 @@
 "use client";
 
-import { PromptCardListProps } from "@/types";
+import { PromptCardListProps, PromptState } from "@/types";
 import { ChangeEvent, useEffect, useState } from "react";
 import PromptCard from "./PromptCard";
 
 const PromptCardList = ({ data, handleTagClick }: PromptCardListProps) => (
   <div className="mt-16 prompt_layout">
-    {data.map((prompt) => (
+    {data.map((post) => (
       <PromptCard
-        key={prompt.prompt}
-        prompt={prompt}
+        key={post.prompt}
+        prompt={post}
         handleTagClick={handleTagClick}
       />
     ))}
@@ -17,18 +17,48 @@ const PromptCardList = ({ data, handleTagClick }: PromptCardListProps) => (
 );
 
 const Feed = () => {
+  const [prompts, setPrompts] = useState<PromptState[]>([]);
+  // Search states
   const [searchText, setSearchText] = useState("");
-  const [prompts, setPrompts] = useState([]);
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {};
-  const handleTagClick = (tag: string) => {};
+  const [searchTimeout, setSearchTimeout] = useState<any>(null);
+  const [searchedResults, setSearchedResults] = useState<PromptState[]>([]);
+
+  const filterPosts = (search: string) => {
+    const regex = new RegExp(search, "i");
+    return prompts.filter(
+      (p) =>
+        regex.test(p.prompt) ||
+        regex.test(p.creator!?.username) ||
+        regex.test(p.tag)
+    );
+  };
+
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    clearTimeout(searchTimeout);
+    setSearchText(e.target.value);
+    setSearchTimeout(
+      setTimeout(() => {
+        setSearchedResults(filterPosts(e.target.value));
+      }, 500)
+    );
+  };
+
+  const handleTagClick = (tag: string) => {
+    setSearchText(tag);
+    const searchResult = filterPosts(tag);
+    setSearchedResults(searchResult);
+  };
+
+  const fetchPrompts = async () => {
+    const res = await fetch("/api/prompt");
+    const data = await res.json();
+    setPrompts(data);
+  };
+
   useEffect(() => {
-    const fetchPrompts = async () => {
-      const res = await fetch("/api/prompt");
-      const data = await res.json();
-      setPrompts(data);
-    };
     fetchPrompts();
   }, []);
+
   return (
     <section className="feed">
       <form className="relative w-full flex-center">
@@ -41,7 +71,10 @@ const Feed = () => {
           className="search_input peer"
         />
       </form>
-      <PromptCardList data={prompts} handleTagClick={handleTagClick} />
+      <PromptCardList
+        data={searchText ? searchedResults : prompts}
+        handleTagClick={handleTagClick}
+      />
     </section>
   );
 };

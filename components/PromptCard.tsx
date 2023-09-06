@@ -15,7 +15,14 @@ const PromptCard = ({
   const { data: session } = useSession();
   const [copied, setCopied] = useState("");
   const pathName = usePathname();
-  const handleProfileClick = () => {};
+  const router = useRouter();
+  const handleProfileClick = () => {
+    if (prompt.creator?._id === session?.user.id)
+      return router.push("/profile");
+    router.push(
+      `/profile/${prompt.creator?._id}?name=${prompt.creator?.username}`
+    );
+  };
   const handleCopy = () => {
     setCopied(prompt.prompt);
     navigator.clipboard.writeText(prompt.prompt);
@@ -29,7 +36,7 @@ const PromptCard = ({
           onClick={handleProfileClick}
         >
           <Image
-            src={prompt.creator.image}
+            src={prompt.creator?.image || ""}
             alt="user_image"
             width={40}
             height={40}
@@ -38,10 +45,10 @@ const PromptCard = ({
 
           <div className="flex flex-col">
             <h3 className="font-satoshi font-semibold text-gray-900">
-              {prompt.creator.username}
+              {prompt.creator!.username}
             </h3>
             <p className="font-inter text-sm text-gray-500">
-              {prompt.creator.email}
+              {prompt.creator!.email}
             </p>
           </div>
         </div>
@@ -68,7 +75,7 @@ const PromptCard = ({
         #{prompt.tag}
       </p>
 
-      {session?.user.id === prompt.creator._id && pathName === "/profile" && (
+      {session?.user.id === prompt.creator!._id && pathName === "/profile" && (
         <div className="mt-5 flex-center gap-4 border-t border-gray-100 pt-3">
           <p
             className="font-inter text-sm green_gradient cursor-pointer"

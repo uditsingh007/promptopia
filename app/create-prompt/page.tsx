@@ -1,12 +1,13 @@
 "use client";
 
 import Form from "@/components/Form";
+import { PromptState } from "@/types";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 
 const CreatePrompt = () => {
-  const [post, setPost] = useState({
+  const [post, setPost] = useState<PromptState>({
     prompt: "",
     tag: "",
   });
